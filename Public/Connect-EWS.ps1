@@ -25,7 +25,13 @@ Param (
         "All"
     )]
     [ValidateNotNullOrEmpty()]
-    [String]$RedirectPolicy = "None"
+    [String]$RedirectPolicy = "None",
+
+    [Alias(
+        "Folder"
+    )]
+    [ValidateNotNull()]
+    [Microsoft.Exchange.WebServices.Data.WellKnownFolderName]$ExchangeFolder = [Microsoft.Exchange.WebServices.Data.WellKnownFolderName]::Root
 )
 
 Process {
@@ -98,13 +104,14 @@ Process {
                 Write-Verbose "Attempting to bind to root folder..."
 
                 # Try to bind to the root folder of our account, just to make sure we were able to form a connection of some sort
-                [Microsoft.Exchange.WebServices.Data.Folder]::Bind($ExchSvc, [Microsoft.Exchange.WebServices.Data.WellKnownFolderName]::Root) | Out-Null
+                [Microsoft.Exchange.WebServices.Data.Folder]::Bind($ExchSvc, $ExchangeFolder) | Out-Null
 
                 Write-Verbose "$Account connected to $($ExchSvc.Url)"
                 $_Profile.Server = ([URI]$ExchSvc.Url).Host
                 $_Profile.ExchangeService = $ExchSvc
                 
             } catch {
+                Write-Verbose $_
                 Write-Error "Failed to validate connection to Exchange. Verify the credentials are correct and try again."
             }
             
