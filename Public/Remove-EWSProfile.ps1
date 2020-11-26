@@ -17,5 +17,11 @@ Param(
     [GUID]$ProfileGUID
 )
 	
-	return $Script:EWSProfiles.Remove($ProfileGUID)
+    $success = $Script:EWSProfiles.Remove($ProfileGUID)
+
+    if ($success -eq $true) {
+        Remove-Item -Path $env:APPDATA\PSEWS\Profiles\$ProfileGUID.clixml -Force
+    }
+    
+    return $success
 }
